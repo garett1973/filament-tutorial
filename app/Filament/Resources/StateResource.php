@@ -31,9 +31,12 @@ class StateResource extends Resource
     {
         return $form
             ->schema([
-                Forms\Components\TextInput::make('country_id')
-                    ->required()
-                    ->numeric(),
+                Forms\Components\Select::make('country_id')
+                    ->relationship('country', 'name')
+                    ->searchable()
+//                    ->multiple() // Uncomment this line to allow selecting multiple countries
+                        ->preload()
+                    ->required(),
                 Forms\Components\TextInput::make('name')
                     ->required()
                     ->maxLength(255),

@@ -31,9 +31,10 @@ class DepartmentResource extends Resource
     {
         return $form
             ->schema([
-                Forms\Components\TextInput::make('team_id')
-                    ->required()
-                    ->numeric(),
+                Forms\Components\Select::make('city_id')
+                    ->relationship('city', 'name')
+                    ->searchable()
+                    ->required(),
                 Forms\Components\TextInput::make('name')
                     ->required()
                     ->maxLength(255),
