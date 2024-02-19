@@ -17,12 +17,13 @@ class Employee extends Model
         'state_id',
         'city_id',
         'department_id',
-        'name',
-        'email',
-        'phone',
+        'first_name',
+        'last_name',
+        'middle_name',
         'address',
-        'photo',
-        'status'
+        'zip_code',
+        'date_of_birth',
+        'date_hired',
     ];
 
     public function team(): BelongsTo

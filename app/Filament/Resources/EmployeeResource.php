@@ -24,13 +24,13 @@ class EmployeeResource extends Resource
 
     protected static ?string $navigationIcon = 'heroicon-o-user-group';
 
-    protected static ?string $navigationLabel = 'Employee';
+    protected static ?string $navigationLabel = 'Employees';
 
     protected static ?string $modelLabel = 'Employee';
 
-    protected static ?string $navigationGroup = 'Employees Management';
+    protected static ?string $navigationGroup = 'Employee Management';
 
-    protected static ?int $navigationSort = 1;
+    protected static ?int $navigationSort = 2;
 
     public static function form(Form $form): Form
     {
@@ -97,8 +97,11 @@ class EmployeeResource extends Resource
                 Forms\Components\Section::make('Dates')
                     ->schema([
                         Forms\Components\DatePicker::make('date_of_birth')
+                            ->native(false)
+                            ->displayFormat('m/d/Y')
                             ->required(),
                         Forms\Components\DatePicker::make('date_hired')
+                            ->native(false)
                             ->required(),
                     ])->columns(2),
             ]);
@@ -111,18 +114,18 @@ class EmployeeResource extends Resource
                 Tables\Columns\TextColumn::make('team_id')
                     ->numeric()
                     ->sortable(),
-                Tables\Columns\TextColumn::make('country_id')
-                    ->numeric()
-                    ->sortable(),
-                Tables\Columns\TextColumn::make('state_id')
-                    ->numeric()
-                    ->sortable(),
-                Tables\Columns\TextColumn::make('city_id')
-                    ->numeric()
-                    ->sortable(),
-                Tables\Columns\TextColumn::make('department_id')
-                    ->numeric()
-                    ->sortable(),
+//                Tables\Columns\TextColumn::make('country_id')
+//                    ->numeric()
+//                    ->sortable(),
+//                Tables\Columns\TextColumn::make('state_id')
+//                    ->numeric()
+//                    ->sortable(),
+//                Tables\Columns\TextColumn::make('city_id')
+//                    ->numeric()
+//                    ->sortable(),
+//                Tables\Columns\TextColumn::make('department_id')
+//                    ->numeric()
+//                    ->sortable(),
                 Tables\Columns\TextColumn::make('first_name')
                     ->searchable(),
                 Tables\Columns\TextColumn::make('last_name')
