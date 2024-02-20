@@ -13,4 +13,10 @@ class Team extends Model
         'name',
         'slug'
     ];
+
+    public function departments()
+    {
+        return $this->hasMany(Department::class);
+    }
+
 }

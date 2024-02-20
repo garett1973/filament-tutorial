@@ -7,6 +7,9 @@ use App\Filament\Resources\DepartmentResource\RelationManagers;
 use App\Models\Department;
 use Filament\Forms;
 use Filament\Forms\Form;
+use Filament\Infolists\Components\Section;
+use Filament\Infolists\Infolist;
+use Filament\Infolists\Components\TextEntry;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
@@ -31,13 +34,13 @@ class DepartmentResource extends Resource
     {
         return $form
             ->schema([
+                Forms\Components\TextInput::make('team.name')
+                    ->label('Team')
+                    ->required(),
                 Forms\Components\TextInput::make('name')
                     ->required()
                     ->maxLength(255),
-                Forms\Components\TextInput::make('team_id')
-                    ->required()
-                    ->numeric()
-                    ->maxLength(255),
+                
             ]);
     }
 
@@ -45,11 +48,16 @@ class DepartmentResource extends Resource
     {
         return $table
             ->columns([
-                Tables\Columns\TextColumn::make('team_id')
-                    ->numeric()
+                Tables\Columns\TextColumn::make('team.name')
+                    ->label('Team')
+                    ->searchable()
                     ->sortable(),
                 Tables\Columns\TextColumn::make('name')
-                    ->searchable(),
+                    ->searchable()
+                    ->sortable(),
+                Tables\Columns\TextColumn::make('employees_count')
+                    ->label('Employees Count')
+                    ->counts('employees'),
                 Tables\Columns\TextColumn::make('created_at')
                     ->dateTime()
                     ->sortable()
@@ -73,6 +81,22 @@ class DepartmentResource extends Resource
             ]);
     }
 
+    public static function infolist(Infolist $infolist): Infolist
+    {
+        return $infolist
+            ->schema([
+                Section::make('Department Information')
+                ->schema([
+                    TextEntry::make('name')
+                        ->label('Department'),
+                    TextEntry::make('team.name')
+                        ->label('Team'),
+                    TextEntry::make('employees_count')
+                        ->label('Employees Count'),
+                ])->columns(3),
+            ]);
+    }
+
     public static function getRelations(): array
     {
         return [
@@ -85,7 +109,7 @@ class DepartmentResource extends Resource
         return [
             'index' => Pages\ListDepartments::route('/'),
             'create' => Pages\CreateDepartment::route('/create'),
-            'view' => Pages\ViewDepartment::route('/{record}'),
+            // 'view' => Pages\ViewDepartment::route('/{record}'),
             'edit' => Pages\EditDepartment::route('/{record}/edit'),
         ];
     }
