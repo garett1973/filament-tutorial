@@ -34,8 +34,9 @@ class DepartmentResource extends Resource
     {
         return $form
             ->schema([
-                Forms\Components\TextInput::make('team.name')
+                Forms\Components\Select::make('team_id')
                     ->label('Team')
+                    ->relationship('team', 'name')
                     ->required(),
                 Forms\Components\TextInput::make('name')
                     ->required()

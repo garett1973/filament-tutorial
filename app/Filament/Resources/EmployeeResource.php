@@ -3,7 +3,6 @@
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\EmployeeResource\Pages;
-use App\Filament\Resources\EmployeeResource\RelationManagers;
 use App\Models\City;
 use App\Models\Employee;
 use App\Models\State;
@@ -16,10 +15,14 @@ use Filament\Forms\Get;
 use Filament\Forms\Set;
 use Filament\Resources\Resource;
 use Filament\Tables;
+use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Illuminate\Support\Collection;
+use Filament\Tables\Filters\Filter as FiltersFilter;
+use Carbon\Carbon;
+use Filament\Tables\Enums\FiltersLayout;
 
 class EmployeeResource extends Resource
 {
@@ -39,8 +42,9 @@ class EmployeeResource extends Resource
     {
         return $form
             ->schema([
-                Forms\Components\TextInput::make('team.name')
+                Forms\Components\Select::make('team_id')
                     ->label('Team Name')
+                    ->relationship('team', 'name')
                     ->required(),
                 Forms\Components\Section::make('Location Information')
                     ->schema([
@@ -117,18 +121,6 @@ class EmployeeResource extends Resource
                     ->label('Team')
                     ->searchable()
                     ->sortable(),
-//                Tables\Columns\TextColumn::make('country_id')
-//                    ->numeric()
-//                    ->sortable(),
-//                Tables\Columns\TextColumn::make('state_id')
-//                    ->numeric()
-//                    ->sortable(),
-//                Tables\Columns\TextColumn::make('city_id')
-//                    ->numeric()
-//                    ->sortable(),
-//                Tables\Columns\TextColumn::make('department_id')
-//                    ->numeric()
-//                    ->sortable(),
                 Tables\Columns\TextColumn::make('first_name')
                 ->sortable()
                     ->searchable(),
@@ -168,20 +160,55 @@ class EmployeeResource extends Resource
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
-                Tables\Filters\TrashedFilter::make(),
-            ])
-            ->actions([
-                Tables\Actions\ViewAction::make(),
-                Tables\Actions\EditAction::make(),
-            ])
-            ->bulkActions([
-                Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
-                    Tables\Actions\ForceDeleteBulkAction::make(),
-                    Tables\Actions\RestoreBulkAction::make(),
-                ]),
-            ]);
-    }
+                SelectFilter::make('Department')
+                    ->label('Filter by Department')
+                    ->relationship('department', 'name', fn (Builder $query) => $query->orderBy('name'))
+                    ->searchable()
+                    ->preload()
+                    ->indicator('Department'),
+                FiltersFilter::make('created_from')
+                    ->form([
+                        Forms\Components\DatePicker::make('from'),
+                        Forms\Components\DatePicker::make('until'),
+                    ])
+                    ->query(function (Builder $query, array $data): Builder {
+                        return $query
+                            ->when(
+                                $data['from'],
+                                fn (Builder $query, $date): Builder => $query->whereDate('created_at', '>=', $date),
+                            )
+                            ->when(
+                                $data['until'],
+                                fn (Builder $query, $date): Builder => $query->whereDate('created_at', '<=', $date),
+                            );
+                    })
+                    ->indicateUsing(function (array $data): array {
+                        $indicators = [];
+                 
+                        if ($data['from'] ?? null) {
+                            $indicators['from'] = 'Created from ' . Carbon::parse($data['from'])->toFormattedDateString();
+                        }
+                 
+                        if ($data['until'] ?? null) {
+                            $indicators['until'] = 'Created until ' . Carbon::parse($data['until'])->toFormattedDateString();
+                        }
+                 
+                        return $indicators;
+                    })->columnSpan(2)->columns(2)
+                ], layout: FiltersLayout::AboveContent)->filtersFormColumns(3)
+                            ->actions([
+                                Tables\Actions\ViewAction::make(),
+                                Tables\Actions\EditAction::make(),
+                            ])
+                            ->bulkActions([
+                                Tables\Actions\BulkActionGroup::make([
+                                    Tables\Actions\DeleteBulkAction::make(),
+                                    Tables\Actions\ForceDeleteBulkAction::make(),
+                                    Tables\Actions\RestoreBulkAction::make(),
+                                ]),
+                            ]);
+                    }
+
 
     public static function infolist(Infolist $infolist): Infolist
     {
