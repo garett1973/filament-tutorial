@@ -23,6 +23,8 @@ use Illuminate\Support\Collection;
 use Filament\Tables\Filters\Filter as FiltersFilter;
 use Carbon\Carbon;
 use Filament\Tables\Enums\FiltersLayout;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Contracts\Support\Htmlable;
 
 class EmployeeResource extends Resource
 {
@@ -36,7 +38,55 @@ class EmployeeResource extends Resource
 
     protected static ?string $navigationGroup = 'Employee Management';
 
+    protected static ?string $recordTitleAttribute = 'first_name';
+
     protected static ?int $navigationSort = 2;
+
+    public static function getGlobalSearchResultTitle(Model $record): string|Htmlable
+    {
+        return $record->last_name;
+    }
+
+    public static function getGloballySearchableAttributes(): array
+    {
+        return [
+            'first_name',
+            'last_name',
+            'middle_name',
+            'date_hired',
+            'country.name',
+            'department.name',
+        ];
+    }
+
+    public static function getGlobalSearchEloquentQuery(): Builder
+    {
+        return parent::getGlobalSearchEloquentQuery()
+            ->with(['country']);
+    }
+
+    public static function getGlobalSearchResultDetails(Model $record): array
+    {
+        return [
+            'Team' => $record->team->name,
+            'Country' => $record->country->name,
+            'State' => $record->state->name,
+            'City' => $record->city->name,
+            'Department' => $record->department->name,
+            'Date of Birth' => $record->date_of_birth,
+            'Date Hired' => $record->date_hired,
+        ];
+    }
+
+    public static function getNavigationBadge(): ?string
+    {
+        return static::getModel()::count();
+    }
+
+    public static function getNavigationBadgeColor(): string|array|null
+    {
+        return static::getModel()::count() > 5 ? 'info' : 'danger';
+    }
 
     public static function form(Form $form): Form
     {

@@ -141,4 +141,10 @@ class EmployeesRelationManager extends RelationManager
                 ]),
             ]);
     }
+
+    // if you have view page enabled this function allows you to edit the data in the view page
+    public function isReadOnly(): bool
+    {
+        return false;
+    }
 }

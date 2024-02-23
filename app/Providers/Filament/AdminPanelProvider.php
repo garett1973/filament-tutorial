@@ -35,8 +35,13 @@ class AdminPanelProvider extends PanelProvider
                 'primary' => Color::Indigo,
                 'success' => Color::Emerald,
                 'warning' => Color::Orange,
-            ])
+            ])          
             ->font('Inter', provider: GoogleFontProvider::class)
+            ->navigationGroups([
+                'Employee Management',
+                'System Management',
+                'User Management'
+            ])
             ->brandLogo(fn () => view('filament.admin.logo'))
             ->brandName('Filament Tutorial')
             ->favicon(asset('/images/logo.png'))
