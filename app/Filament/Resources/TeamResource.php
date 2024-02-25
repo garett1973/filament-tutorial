@@ -7,6 +7,7 @@ use App\Filament\Resources\TeamResource\RelationManagers;
 use App\Models\Team;
 use Filament\Forms;
 use Filament\Forms\Form;
+use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
@@ -73,6 +74,14 @@ class TeamResource extends Resource
             ->actions([
                 Tables\Actions\ViewAction::make(),
                 Tables\Actions\EditAction::make(),
+                Tables\Actions\DeleteAction::make()
+                    ->successNotification(
+                        Notification::make('Team Deleted')
+                            ->success('The team has been deleted.'),
+                    )
+
+                    // if you want to prevent showing the notification, return null
+                    // ->successNotification(null)
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
