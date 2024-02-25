@@ -1,30 +1,30 @@
 <?php
 
-namespace App\Filament\Resources;
+namespace App\Filament\App\Resources;
 
-use App\Filament\Resources\EmployeeResource\Pages;
+use App\Filament\App\Resources\EmployeeResource\Pages;
 use App\Models\City;
 use App\Models\Employee;
 use App\Models\State;
+use Carbon\Carbon;
+use Filament\Facades\Filament;
 use Filament\Forms;
+use Illuminate\Database\Eloquent\Builder;
 use Filament\Forms\Form;
-use Filament\Infolists\Components\TextEntry;
-use Filament\Infolists\Components\Section;
-use Filament\Infolists\Infolist;
 use Filament\Forms\Get;
 use Filament\Forms\Set;
+use Filament\Infolists\Components\Section;
+use Filament\Infolists\Components\TextEntry;
+use Filament\Infolists\Infolist;
 use Filament\Resources\Resource;
 use Filament\Tables;
-use Filament\Tables\Filters\SelectFilter;
-use Filament\Tables\Table;
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\SoftDeletingScope;
-use Illuminate\Support\Collection;
-use Filament\Tables\Filters\Filter as FiltersFilter;
-use Carbon\Carbon;
 use Filament\Tables\Enums\FiltersLayout;
-use Illuminate\Database\Eloquent\Model;
+use Filament\Tables\Filters\SelectFilter;
+use Filament\Tables\Filters\Filter as FiltersFilter;
+use Filament\Tables\Table;
 use Illuminate\Contracts\Support\Htmlable;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Collection;
 
 class EmployeeResource extends Resource
 {
@@ -119,7 +119,11 @@ class EmployeeResource extends Resource
                             ->live()
                             ->required(),
                         Forms\Components\Select::make('department_id')
-                            ->relationship('department', 'name')
+                            ->relationship(
+                                'department', 
+                                'name',
+                                modifyQueryUsing: fn (Builder $query) => $query->whereBelongsTo(Filament::getTenant())
+                                )
                             ->searchable()
                             ->preload()
                             ->required(),
@@ -249,7 +253,7 @@ class EmployeeResource extends Resource
                                 ]),
                             ]);
     }
-
+    
     public static function infolist(Infolist $infolist): Infolist
     {
         return $infolist
@@ -301,16 +305,8 @@ class EmployeeResource extends Resource
         return [
             'index' => Pages\ListEmployees::route('/'),
             'create' => Pages\CreateEmployee::route('/create'),
-            // 'view' => Pages\ViewEmployee::route('/{record}'),
+            'view' => Pages\ViewEmployee::route('/{record}'),
             'edit' => Pages\EditEmployee::route('/{record}/edit'),
         ];
-    }
-
-    public static function getEloquentQuery(): Builder
-    {
-        return parent::getEloquentQuery()
-            ->withoutGlobalScopes([
-                SoftDeletingScope::class,
-            ]);
     }
 }
